@@ -1,8 +1,8 @@
-<h1 align="center">📝 github-potpie-agno-agent 📝</h1>
+<h1 align="center">🫚 github-potpie-agno-agent 🫚</h1>
 <h2 align="center">An intelligent agent leveraging Agno, Groq, and Potpie to analyze and interact with GitHub repositories.</h2>
 
 <p align="center">
-    <img alt="hero" width="450" src="https://emoji-route.deno.dev/svg/📝" />
+    <img alt="hero" width="450" src="https://emoji-route.deno.dev/svg/🫚" />
 </p>
 
 > [!NOTE]
