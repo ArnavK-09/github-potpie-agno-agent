@@ -14,7 +14,10 @@ from agno.tools import tool
 from dotenv import load_dotenv
 import requests
 
-load_dotenv() # Load environment variables from .env file
+#########
+## ENV ##
+#########
+load_dotenv()
 
 ############
 ## CONSTS ##
