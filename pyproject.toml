@@ -1,16 +1,15 @@
 [project]
-name = "wow"
+name = "github-potpie-agno-agent"
 version = "0.1.0"
-description = "Add your description here"
+description = "github potpie agno agent"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "agno>=1.3.4",
-    "duckduckgo-search>=8.0.1",
     "fastapi>=0.115.12",
     "groq>=0.22.0",
-    "mcp>=1.6.0",
     "python-dotenv>=0.21.0", # Added for loading .env files
+    "requests>=2.32.3",
     "sqlalchemy>=2.0.40",
-    "yfinance>=0.2.55",
+    "uvicorn>=0.34.2",
 ]

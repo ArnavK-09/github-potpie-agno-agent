@@ -1,7 +1,7 @@
 #############
 ## IMPORTS ##
 #############
-from .agent import github_agent
+from agent import github_agent
 from agno.playground import Playground, serve_playground_app
 
 #################
