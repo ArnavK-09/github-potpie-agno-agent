@@ -19,8 +19,8 @@ load_dotenv() # Load environment variables from .env file
 ############
 ## CONSTS ##
 ############
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "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")
-POTPIE_API_KEY = os.getenv("POTPIE_API_KEY", "sk-23a7f4f61b60594953c6230fc22bd782231ced4ceeed4f23272d29b48e1ec655")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+POTPIE_API_KEY = os.getenv("POTPIE_API_KEY")
 agent_storage: str = ".temp/agents.db"
 
 
