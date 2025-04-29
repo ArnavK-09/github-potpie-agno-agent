@@ -103,39 +103,63 @@ potpie_client = Potpie(api_key=POTPIE_API_KEY)
 #################
 
 @tool(show_result=True)
-def start_repo_parsing(repo_name: str, branch_name: str = "main") -> str:
+async def start_repo_parsing(repo_name: str, branch_name: str = "main") -> str:
     """
     Initiates the parsing process for a given repository and branch using Potpie.
     Returns the initial parsing status, including the project_id needed for follow-up actions.
     Example repo_name: 'owner/repo'
     """
     try:
+        if not repo_name or '/' not in repo_name:
+            return "Invalid repository name format. Expected format: 'owner/repo'"
+            
         logging.info(f"Starting parsing for {repo_name} on branch {branch_name}")
-        result = asyncio.run_coroutine_threadsafe(
-            asyncio.to_thread(potpie_client.parse_repository, repo_name=repo_name, branch_name=branch_name),
-            asyncio.get_running_loop()
-        ).result()
-        logging.info(f"Parsing initiated: {result}")
-        return str(result)
+        result = await asyncio.to_thread(potpie_client.parse_repository, repo_name=repo_name, branch_name=branch_name)
+        
+        if isinstance(result, dict) and 'project_id' in result:
+            project_id = result['project_id']
+            logging.info(f"Parsing initiated successfully: {result}")
+            return f"Successfully started parsing repository {repo_name}\nProject ID: {project_id}\nStatus: Parsing initiated"
+        else:
+            logging.error(f"Invalid response format from Potpie API: {result}")
+            return f"Failed to parse repository: Invalid API response format"
+            
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Network error during repo parsing for {repo_name}: {e}")
+        return f"Failed to parse repository: Network error - {str(e)}"
     except Exception as e:
-        logging.error(f"Error starting repo parsing for {repo_name}: {e}")
-        return f"Failed to start parsing: {str(e)}"
+        logging.error(f"Unexpected error during repo parsing for {repo_name}: {e}")
+        return f"Failed to parse repository: {str(e)}"
 
 @tool(show_result=True)
-def check_repo_parsing_status(project_id: str) -> str:
+async def check_repo_parsing_status(project_id: str) -> str:
     """
     Checks the parsing status of a repository using its Potpie project_id.
     """
     try:
+        if not project_id:
+            return "Invalid project_id: Project ID cannot be empty"
+            
         logging.info(f"Checking parsing status for project_id: {project_id}")
-        status = asyncio.run_coroutine_threadsafe(
-             asyncio.to_thread(potpie_client.get_parsing_status, project_id, wait_for_ready=False),
-             asyncio.get_running_loop()
-        ).result()
-        logging.info(f"Parsing status for {project_id}: {status}")
-        return str(status)
+        status = await asyncio.to_thread(potpie_client.get_parsing_status, project_id, wait_for_ready=False)
+        
+        if isinstance(status, dict):
+            status_value = status.get('status')
+            if status_value:
+                logging.info(f"Parsing status for {project_id}: {status}")
+                return f"Current parsing status: {status_value}"
+            else:
+                logging.error(f"Invalid status response format: {status}")
+                return "Failed to get parsing status: Invalid response format"
+        else:
+            logging.error(f"Invalid response type from Potpie API: {type(status)}")
+            return "Failed to get parsing status: Invalid API response type"
+            
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Network error checking parsing status for {project_id}: {e}")
+        return f"Failed to get parsing status: Network error - {str(e)}"
     except Exception as e:
-        logging.error(f"Error checking parsing status for {project_id}: {e}")
+        logging.error(f"Unexpected error checking parsing status for {project_id}: {e}")
         return f"Failed to get parsing status: {str(e)}"
 
 
@@ -266,7 +290,7 @@ if not GROQ_API_KEY or not POTPIE_API_KEY:
 
 github_agent = Agent(
     name="GitHub QnA Agent",
-    model=Groq(api_key=GROQ_API_KEY),
+    model=Groq(api_key=GROQ_API_KEY, max_retries=3),
     tools=agent_tools,
     instructions=[
         "You are a specialized GitHub QnA agent.",
